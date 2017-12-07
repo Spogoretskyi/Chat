@@ -174,12 +174,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Test\AuthenticationService.csproj">
-      <Project>{366ccdc8-a209-49a5-a899-865bb3893939}</Project>
-      <Name>AuthenticationService</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Connected Services\ProxyAuthentication\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>

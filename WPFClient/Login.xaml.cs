@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.Windows;
 using System.Windows.Input;
 
@@ -10,8 +12,9 @@ namespace WPFClient
         Registrarion registrarion;
         MainWindow mainwindow;
         ProxyAuthentication.AuthenticationContractClient server;
+        private ServiceHost host;
 
-        public Login() 
+        public Login()
         {
             try
             {
@@ -29,22 +32,29 @@ namespace WPFClient
             try
             {
                 var result = server.ConnectTo(login.Text, password.Password);
-                if (result == "true")
+                switch (result)
                 {
-                    mainwindow = new MainWindow(this);
-                    mainwindow.Show();
-                    Close();
-                }
-                else if (result == "code")
-                {
-                    ErrorMessage.Content = "Please enter registration code";
-                    code = new Code(login.Text);
-                    code.Show();
-                    ErrorMessage.Content = "";
-                }
-                else
-                {
-                    ErrorMessage.Content = "Name or password is incorrect";
+                    case "true":
+                        mainwindow = new MainWindow(this);
+                        mainwindow.Show();
+                        Close();
+                        break;
+                    case "code":
+                        MessageBox.Show("Please enter registration code in registration form", "Chat",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+                        code = new Code(login.Text);
+                        code.Show();
+                        ErrorMessage.Content = "";
+                        break;
+                    case "logged":
+                        ErrorMessage.Content = "User has already logged in this system";
+                        break;
+                    case "notRegistered":
+                        ErrorMessage.Content = "The user is not registered";
+                        break;
+                    case "false":
+                        ErrorMessage.Content = "Name or password is incorrect";
+                        break;
                 }
             }
             catch (Exception ex)

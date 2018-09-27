@@ -11,7 +11,6 @@ namespace AuthenticationService
         static string caption = "Chat: Regisrtation code";
         static string message = "Please, enter registration code into Login form!\n";
         static string attachFile = null;
-
         static string SMTPServer { get; set; }
         static string SMTPRequiresAuthentication { get; set; }
         static string SMTPUseSsl { get; set; }
@@ -46,8 +45,7 @@ namespace AuthenticationService
                 mail.Subject = caption;
                 Console.WriteLine(caption);
                 mail.Body = fullMessage;
-                if (!string.IsNullOrEmpty(attachFile))
-                    mail.Attachments.Add(new Attachment(attachFile));
+                if (!string.IsNullOrEmpty(attachFile)) mail.Attachments.Add(new Attachment(attachFile));
                 SmtpClient client = new SmtpClient();
                 client.Host = SMTPServer;
                 Console.WriteLine(SMTPServer);

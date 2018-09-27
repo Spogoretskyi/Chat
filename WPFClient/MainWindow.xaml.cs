@@ -6,6 +6,8 @@ using System.ServiceModel;
 using System.Windows.Threading;
 using WPFClient.Proxy;
 using System.IO;
+using System.Security.Authentication.ExtendedProtection;
+using System.Threading;
 using Microsoft.Win32;
 
 namespace WPFClient
@@ -13,13 +15,15 @@ namespace WPFClient
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Single, UseSynchronizationContext = false)]
     public partial class MainWindow : Window, Proxy.IServiceContractCallback
     {
-        static string userName = String.Empty;
-        Proxy.User user = new Proxy.User();
-        InstanceContext context;
-        Proxy.ServiceContractClient server;
-        static string _files_path = 
-            String.Format(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + 
-                "\\Files\\");
+        private static string userName = String.Empty;
+        private static string SendTo = String.Empty;
+        private Proxy.User user = new Proxy.User();
+        private InstanceContext context;
+        private Proxy.ServiceContractClient server;
+        private bool isFileChecked = false;
+        private static string _files_path =
+            String.Format(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
+                          "\\Files\\");
 
         public MainWindow(Login window)
         {
@@ -32,15 +36,19 @@ namespace WPFClient
                 {
                     dir.Create();
                 }
+                
                 userName = window.login.Text;
                 user.UserName = userName;
                 context = new InstanceContext(this);
                 server = new Proxy.ServiceContractClient(context);
-                server.Connect(userName);
-                ListBox_Users.Items.Add(userName);
-                server.GetAllUsers();
+                server.Connect(user);
+                Thread.Sleep(1000);
+                server.GetUser(user);
+
                 string connect = String.Format("You connected at {0}\n", DateTime.Now.ToString("HH:mm"));
+                SendTo = "";
                 Add_Colors(connect, Brushes.CadetBlue);
+                
             }
             catch (Exception ex)
             {
@@ -50,8 +58,7 @@ namespace WPFClient
 
         private void Add_Colors(string str, Brush color)
         {
-            TextRange tr = new TextRange(TextBox_Chat.Document.ContentEnd, 
-                TextBox_Chat.Document.ContentEnd);
+            TextRange tr = new TextRange(TextBox_Chat.Document.ContentEnd, TextBox_Chat.Document.ContentEnd);
             tr.Text = str;
             tr.ApplyPropertyValue(TextElement.ForegroundProperty, color);
             TextBox_Chat.ScrollToEnd();
@@ -61,15 +68,20 @@ namespace WPFClient
         {
             try
             {
-                ListBox_Users.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
-                { ListBox_Users.Items.Clear(); }));
-                foreach (var user in allUsers)
+                ListBox_Users.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() =>
                 {
-                    ListBox_Users.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                    ListBox_Users.Items.Clear();
+
+                    if (allUsers.Length > 2)
+                        ListBox_Users.Items.Add("All");
+
+                    ListBox_Users.Items.Add(userName + " (you)");
+
+                    foreach (var user in allUsers)
                     {
-                        ListBox_Users.Items.Add(user.UserName);
-                    }));
-                }
+                        if (user.UserName != userName) ListBox_Users.Items.Add(user.UserName);
+                    }
+                }));
             }
             catch (Exception ex)
             {
@@ -93,11 +105,24 @@ namespace WPFClient
         {
             try
             {
-                TextBox_Chat.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-                {
-                    Add_Colors(message, Brushes.DarkSlateGray);
-                }));
-                server.GetAllUsers();
+                TextBox_Chat.Dispatcher.Invoke(DispatcherPriority.Background,
+                    new Action(() => { Add_Colors(message, Brushes.DarkSlateGray); }));
+                server.GetUser(user);
+                //server.GetAllUsers();
+            }
+            catch (Exception ex)
+            {
+                LogFile.GetExceptions(ex);
+            }
+        }
+
+        public void RecievePmMessage(string message)
+        {
+            try
+            {
+                TextBox_Chat.Dispatcher.Invoke(DispatcherPriority.Background,
+                    new Action(() => { Add_Colors(message, Brushes.DarkSlateGray); }));
+               server.GetUser(user);
             }
             catch (Exception ex)
             {
@@ -107,95 +132,64 @@ namespace WPFClient
 
         private void Button_Send_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                Proxy.ChatMessage message = new Proxy.ChatMessage();
-                context = new InstanceContext(this);
-                server = new Proxy.ServiceContractClient(context);
-                if (TextBox_Input.Text != String.Empty)
-                {
-                    message.User = user;
-                    message.Message = TextBox_Input.Text;
-                    message.Date = DateTime.Now;
-                    string ownMeassage = String.Format("You says to all: {0} at {1}\n", 
-                        message.Message, DateTime.Now.ToString("HH:mm"));
-                    server.SendMessage(message);
-                    Add_Colors(ownMeassage, Brushes.DarkCyan);
-                }
-                TextBox_Input.Text = String.Empty;
-            }
-            catch (Exception ex)
-            {
-                LogFile.GetExceptions(ex);
-            }
-        }
-        private void Button_Send_PM_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                Proxy.ChatMessage message = new Proxy.ChatMessage();
-                context = new InstanceContext(this);
-                server = new Proxy.ServiceContractClient(context);
-                if (TextBox_Input.Text != String.Empty)
-                {
-                    message.User = user;
-                    message.Message = TextBox_Input.Text;
-                    message.Date = DateTime.Now;
-                    if (ListBox_Users.SelectedItem != null && 
-                        ListBox_Users.SelectedItem.ToString() != userName)
+                    try
                     {
-                        string ownMeassage = String.Format("You says to {0}: {1} at {2}\n", 
-                            ListBox_Users.SelectedItem.ToString(), message.Message, 
-                            DateTime.Now.ToString("HH:mm"));
-                        server.SendPMmessage(message, ListBox_Users.SelectedItem.ToString());
-                        Add_Colors(ownMeassage, Brushes.DarkCyan);
+                        Proxy.ChatMessage message = new Proxy.ChatMessage();
+                        if (TextBox_Input.Text != String.Empty)
+                        {
+                            //send to all
+                            if (SendTo == String.Empty || SendTo == "All")
+                            {
+                                message.User = user;
+                                message.Message = TextBox_Input.Text;
+                                message.Date = DateTime.Now;
+                                string ownMeassage = String.Format("You says to all: {0} at {1}\n", message.Message,
+                                    DateTime.Now.ToString("HH:mm"));
+                                server.SendMessage(message);
+                                Add_Colors(ownMeassage, Brushes.DarkCyan);
+                            }
+                            //send PM
+                            else if (SendTo != String.Empty || SendTo != "All")
+                            {
+                                message.User = user;
+                                message.Message = TextBox_Input.Text;
+                                message.Date = DateTime.Now;
+                                string ownMeassage = String.Format("You says to {0}: {1} at {2}\n",
+                                    SendTo, message.Message,
+                                    DateTime.Now.ToString("HH:mm"));
+                                server.SendPMmessage(message, SendTo);
+                                Add_Colors(ownMeassage, Brushes.DarkCyan);
+                                
+                             }
+                        }
+                        TextBox_Input.Text = String.Empty;
+                        SendTo = "";
+                        ListBox_Users.UnselectAll();
                     }
-                }
-                TextBox_Input.Text = String.Empty;
-            }
-            catch (Exception ex)
-            {
-                LogFile.GetExceptions(ex);
-            }
+                    catch (Exception ex)
+                    {
+                        LogFile.GetExceptions(ex);
+                    }
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            try
-            {
-                context = new InstanceContext(this);
-                server = new Proxy.ServiceContractClient(context);
                 server.RemoveUser(user);
-            }
-            catch (Exception ex)
-            {
-                LogFile.GetExceptions(ex);
-            }
-            Environment.Exit(0);
+                Environment.Exit(0);
         }
 
         private void Button_Disconnect_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                context = new InstanceContext(this);
-                server = new Proxy.ServiceContractClient(context);
                 server.RemoveUser(user);
-            }
-            catch (Exception ex)
-            {
-                LogFile.GetExceptions(ex);
-            }
-           Environment.Exit(0);
+                Environment.Exit(0);
         }
 
         public void ReceiverFile(FileMessage fileMsg)
         {
             try
             {
-                FileStream stream = new FileStream(_files_path +
-                               fileMsg.FileName, FileMode.Create,
-                               FileAccess.ReadWrite);
+                FileStream stream =
+                    new FileStream(_files_path + fileMsg.FileName, FileMode.Create, FileAccess.ReadWrite);
                 stream.Write(fileMsg.Data, 0, fileMsg.Data.Length);
             }
             catch (Exception ex)
@@ -206,8 +200,7 @@ namespace WPFClient
 
         private void Button_Send_File_Click(object sender, RoutedEventArgs e)
         {
-            if (ListBox_Users.SelectedItem != null && 
-                ListBox_Users.SelectedItem.ToString() != userName)
+            if (SendTo != String.Empty || SendTo != (userName + " (you)"))
             {
                 Stream stream = null;
                 try
@@ -215,6 +208,7 @@ namespace WPFClient
                     OpenFileDialog fileDialog = new OpenFileDialog();
                     fileDialog.Multiselect = false;
                     fileDialog.CheckFileExists = true;
+                    fileDialog.CheckPathExists = true;
                     fileDialog.RestoreDirectory = true;
 
                     if (fileDialog.ShowDialog() == true)
@@ -222,19 +216,21 @@ namespace WPFClient
                         stream = fileDialog.OpenFile();
                         if (stream != null)
                         {
-                            byte[] buffer = new byte[(int)stream.Length];
+                            byte[] buffer = new byte[(int) stream.Length];
                             int bytes = stream.Read(buffer, 0, buffer.Length);
                             if (bytes > 0)
                             {
                                 Proxy.FileMessage message = new FileMessage();
                                 message.FileName = fileDialog.SafeFileName;
+                                message.Data = buffer;
                                 message.Sender = user.UserName;
                                 message.Time = DateTime.Now;
                                 message.Data = buffer;
-                                server.SendFile(message, ListBox_Users.SelectedItem.ToString());
+                                server.SendFile(message, SendTo);
                             }
-                            string ownMeassage = String.Format("You sent to {0} file at {1}\n", 
-                                ListBox_Users.SelectedItem.ToString(), DateTime.Now.ToString("HH:mm"));
+
+                            string ownMeassage = String.Format("You sent to {0} file at {1}\n",
+                                SendTo, DateTime.Now.ToString("HH:mm"));
                             Add_Colors(ownMeassage, Brushes.DarkCyan);
                         }
                     }
@@ -250,12 +246,28 @@ namespace WPFClient
                         stream.Close();
                     }
                 }
+                TextBox_Input.Text = String.Empty;
+                SendTo = "";
+                ListBox_Users.UnselectAll();
             }
         }
 
         private void Button_File_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start(_files_path);
+            ListBox_Users.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+            {
+                if (ListBox_Users.SelectedItem.ToString() != (userName + " (you)"))
+                {
+                    System.Diagnostics.Process.Start(_files_path);
+                }
+            }));
         }
+
+        private void ListBox_Users_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+                    if (ListBox_Users.SelectedItem.ToString() != (userName + " (you)"))
+                        SendTo = ListBox_Users.SelectedItem.ToString();
+        }
+
     }
 }

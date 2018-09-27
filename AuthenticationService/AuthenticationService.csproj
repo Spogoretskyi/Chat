@@ -61,7 +61,11 @@
     <Compile Include="Hash.cs" />
     <Compile Include="IAuthenticationContract.cs" />
     <Compile Include="LogFile.cs" />
-    <Compile Include="Model\BisUsersFilter.cs" />
+    <Compile Include="Model\BisAccountFilter.cs" />
+    <Compile Include="Model\BisUserFilter.cs" />
+    <Compile Include="Model\LogAuthenticationFilter.cs" />
+    <Compile Include="Model\LogConnectFilter.cs" />
+    <Compile Include="Model\LogMessagingFilter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SMTP.cs" />
@@ -77,6 +81,10 @@
     <ProjectReference Include="..\DBLayer\DBLayer.csproj">
       <Project>{2c7386b7-5719-4c84-a049-5a91d27b3acf}</Project>
       <Name>DBLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LogData\LogData.csproj">
+      <Project>{becc17bf-3501-429f-a5be-15deb098c849}</Project>
+      <Name>LogData</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

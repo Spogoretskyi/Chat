@@ -52,13 +52,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BisLayer\BizUsers.cs" />
-    <Compile Include="DBmodel.cs" />
+    <Compile Include="Account.cs" />
+    <Compile Include="BisLayer\BisAccount.cs" />
+    <Compile Include="BisLayer\BisLogAuthentication.cs" />
+    <Compile Include="BisLayer\BisLogConnect.cs" />
+    <Compile Include="BisLayer\BisLogMessaging.cs" />
+    <Compile Include="BisLayer\BisUser.cs" />
+    <Compile Include="EntityDBModel.cs" />
+    <Compile Include="Log_Authentication.cs" />
+    <Compile Include="Log_Connect.cs" />
+    <Compile Include="Log_messaging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repositories\BisUsersService.cs" />
+    <Compile Include="Repositories\AccountRepository.cs" />
+    <Compile Include="Repositories\BisAccountService.cs" />
+    <Compile Include="Repositories\BisUserService.cs" />
     <Compile Include="Repositories\IEntityService.cs" />
-    <Compile Include="Repositories\UsersRepository.cs" />
-    <Compile Include="Users.cs" />
+    <Compile Include="Repositories\LogAuthenticationRepository.cs" />
+    <Compile Include="Repositories\LogAuthenticationService.cs" />
+    <Compile Include="Repositories\LogConnectRepository.cs" />
+    <Compile Include="Repositories\LogConnectService.cs" />
+    <Compile Include="Repositories\LogMessagingRepository.cs" />
+    <Compile Include="Repositories\LogMessagingService.cs" />
+    <Compile Include="Repositories\UserRepository.cs" />
+    <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

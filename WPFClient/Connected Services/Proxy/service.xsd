@@ -5,21 +5,21 @@
   <xs:element name="Connect">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string" />
+        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/Server" minOccurs="0" name="user" nillable="true" type="q1:User" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SendMessage">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/Server" minOccurs="0" name="message" nillable="true" type="q1:ChatMessage" />
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/Server" minOccurs="0" name="message" nillable="true" type="q2:ChatMessage" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SendPMmessage">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/Server" minOccurs="0" name="newMessage" nillable="true" type="q2:ChatMessage" />
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/Server" minOccurs="0" name="newMessage" nillable="true" type="q3:ChatMessage" />
         <xs:element minOccurs="0" name="receiver" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
@@ -27,7 +27,14 @@
   <xs:element name="RemoveUser">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/Server" minOccurs="0" name="user" nillable="true" type="q3:User" />
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/Server" minOccurs="0" name="user" nillable="true" type="q4:User" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetUser">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/Server" minOccurs="0" name="user" nillable="true" type="q5:User" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -39,7 +46,7 @@
   <xs:element name="SendFile">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/HW_Chat_V3" minOccurs="0" name="message" nillable="true" type="q4:FileMessage" />
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/HW_Chat_V3" minOccurs="0" name="message" nillable="true" type="q6:FileMessage" />
         <xs:element minOccurs="0" name="receiver" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
@@ -58,24 +65,31 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="RecievePmMessage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="message" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="All_Users">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/Server" minOccurs="0" name="allUsers" nillable="true" type="q5:ArrayOfUser" />
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/Server" minOccurs="0" name="allUsers" nillable="true" type="q7:ArrayOfUser" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="UserRemove">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/Server" minOccurs="0" name="user" nillable="true" type="q6:User" />
+        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/Server" minOccurs="0" name="user" nillable="true" type="q8:User" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="ReceiverFile">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/HW_Chat_V3" minOccurs="0" name="message" nillable="true" type="q7:FileMessage" />
+        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/HW_Chat_V3" minOccurs="0" name="message" nillable="true" type="q9:FileMessage" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

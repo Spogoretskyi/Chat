@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPFClient"
         mc:Ignorable="d"
-        Title="" Height="330" MinHeight="330" MaxHeight="330" Width="415" MinWidth="415" MaxWidth="415" FontFamily="X-Files" Closed="Window_Closed">
+        Title="" Height="330" MinHeight="330" MaxHeight="330" Width="480" MinWidth="480" MaxWidth="480" FontFamily="X-Files" Closed="Window_Closed">
     <Grid>
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -16,14 +16,28 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <RichTextBox x:Name="TextBox_Chat" HorizontalAlignment="Left" Height="190" Margin="3,3,0,0" VerticalAlignment="Top" Width="264" FontSize="12"/>
-        <TextBox x:Name="TextBox_Input" HorizontalAlignment="Left" Height="54" Margin="3,198,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Foreground="DarkCyan" Width="199"/>
-        <ListBox x:Name="ListBox_Users" HorizontalAlignment="Left" Foreground="DarkCyan"
-                 Height="225" Margin="272,27,0,0" VerticalAlignment="Top" 
-                 Width="126" FontSize="12"
-                  IsSelected="True"/>
-        <Label x:Name="Label_Users" Content="Users:" HorizontalAlignment="Left" Margin="274,5,0,0" VerticalAlignment="Top" FontFamily="X-Files" Foreground="White"/>
-        <Button x:Name="Button_Send" Content="Send" IsDefault="True" HorizontalAlignment="Left" Margin="3,257,0,0" VerticalAlignment="Top" Width="264" Height="30" Foreground="White" FontFamily="X-Files" BorderThickness="0,1,1,1" Click="Button_Send_Click">
+        <RichTextBox x:Name="TextBox_Chat" HorizontalAlignment="Left" Height="190" Margin="3,3,0,0" VerticalAlignment="Top" Width="276" FontSize="12"/>
+        <TextBox x:Name="TextBox_Input" HorizontalAlignment="Left" Height="54" Margin="3,198,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Foreground="DarkCyan" Width="276"/>
+        <ListBox x:Name="ListBox_Users" HorizontalAlignment="Left" Foreground="DarkCyan" Height="225" Margin="284,27,0,0" VerticalAlignment="Top" 
+          Width="178" FontSize="12" IsSelected="True" SelectionChanged="ListBox_Users_SelectionChanged">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True" >
+                            <Setter Property="FontWeight" Value="Bold" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Foreground" Value="RoyalBlue" />
+                        </Trigger>
+                    </Style.Triggers>
+                    <Style.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                    </Style.Resources>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+
+        <Label x:Name="Label_Users" Content="Users:" HorizontalAlignment="Left" Margin="285,5,0,0" VerticalAlignment="Top" FontFamily="X-Files" Foreground="White"/>
+        <Button x:Name="Button_Send" Content="Send" IsDefault="True" HorizontalAlignment="Left" Margin="3,259,0,0" VerticalAlignment="Top" Width="276" Height="30" Foreground="White" FontFamily="X-Files" BorderThickness="0,1,1,1" Click="Button_Send_Click">
             <Button.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="Black" Offset="0"/>
@@ -31,31 +45,29 @@
                 </LinearGradientBrush>
             </Button.Background>
         </Button>
-        <Button x:Name="Button_Send_PM" Content="PM" HorizontalAlignment="Left" Margin="206,198,0,0" VerticalAlignment="Top" Width="61" Height="25" Foreground="White" FontFamily="X-Files" BorderThickness="0,1,1,1" Click="Button_Send_PM_Click">
+        <Button x:Name="Button_Send_File" HorizontalAlignment="Left" Margin="285,259,0,0" VerticalAlignment="Top" Width="31" Height="30" Foreground="White" FontFamily="X-Files" BorderThickness="0,1,1,1" Click="Button_Send_File_Click" RenderTransformOrigin="0.5,0">
             <Button.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="Black" Offset="0"/>
                     <GradientStop Color="#FF42FFF5" Offset="1"/>
                 </LinearGradientBrush>
             </Button.Background>
+            <DockPanel>
+                <Image Source="../Attach_File-512.png" Width="29"/>
+            </DockPanel>
         </Button>
-        <Button x:Name="Button_Send_File" Content="Browse" HorizontalAlignment="Left" Margin="206,228,0,0" VerticalAlignment="Top" Width="61" Height="24" Foreground="White" FontFamily="X-Files" BorderThickness="0,1,1,1" Click="Button_Send_File_Click" RenderTransformOrigin="0.5,0.5">
+        <Button x:Name="Button_File" HorizontalAlignment="Left" Margin="426,259,0,0" VerticalAlignment="Top" Width="36" Height="30" Foreground="White" FontFamily="X-Files" BorderThickness="0,1,1,1" Click="Button_File_Click">
             <Button.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="Black" Offset="0"/>
                     <GradientStop Color="#FF42FFF5" Offset="1"/>
                 </LinearGradientBrush>
             </Button.Background>
+            <DockPanel>
+                <Image Source="../Closed_Folder-512.png" Width="29"/>
+            </DockPanel>
         </Button>
-        <Button x:Name="Button_File" Content="File" HorizontalAlignment="Left" Margin="274,258,0,0" VerticalAlignment="Top" Width="41" Height="29" Foreground="White" FontFamily="X-Files" BorderThickness="0,1,1,1" Click="Button_File_Click">
-            <Button.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Black" Offset="0"/>
-                    <GradientStop Color="#FF42FFF5" Offset="1"/>
-                </LinearGradientBrush>
-            </Button.Background>
-        </Button>
-        <Button x:Name="Button_Disconnect" Content="Disconnect" HorizontalAlignment="Left" Margin="320,258,0,0" VerticalAlignment="Top" Width="80" Height="30" FontFamily="X-Files" Foreground="White" Click="Button_Disconnect_Click">
+        <Button x:Name="Button_Disconnect" Content="Disconnect" HorizontalAlignment="Left" Margin="321,259,0,0" VerticalAlignment="Top" Width="100" Height="30" FontFamily="X-Files" Foreground="White" Click="Button_Disconnect_Click">
             <Button.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="Black" Offset="0"/>

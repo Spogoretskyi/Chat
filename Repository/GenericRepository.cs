@@ -6,18 +6,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity.Migrations;
 
-
 namespace Repository
 {
     public abstract class GenericRepository<T> : IGenericRepository<T> where T : class, new()
     {
         DbContext context;
         IDbSet<T> dbSet;
+
         public GenericRepository(DbContext context)
         {
             this.context = context;
             dbSet = context.Set<T>();
         }
+
         public void AddOrUpdate(T obj)
         {
             dbSet.AddOrUpdate(obj);
@@ -43,6 +44,11 @@ namespace Repository
         public IEnumerable<T> GetAll()
         {
             return dbSet;
+        }
+
+        public T GetByName(string name)
+        {
+            return dbSet.Find();
         }
     }
 }

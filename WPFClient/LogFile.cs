@@ -5,7 +5,8 @@ namespace WPFClient
 {
     static class LogFile
     {
-        static string _logpath = String.Format(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
+        static string _logpath =
+            String.Format(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
 
         public static void GetExceptions(Exception ex)
         {
@@ -19,8 +20,9 @@ namespace WPFClient
                     outputFile.Close();
                 }
             }
-            catch { }
-
+            catch
+            {
+            }
         }
     }
 }

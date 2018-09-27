@@ -1,71 +1,115 @@
 ﻿using System;
 using System.Linq;
 using DBLayer.Repositories;
-using DBLayer.BizLayer;
+using DBLayer.BisLayer;
+using LogData;
 
 namespace AuthenticationService
 {
     class AuthenticationService : IAuthenticationContract
     {
+        IEntityService<BisUser> BisUserService;
+        IEntityService<BisUser> newUser;
+        IEntityService<BisAccount> BisAccountService;
+        LogAction logAction = new LogAction();
+        BisUser user;
+        BisAccount account;
 
         public string ConnectTo(string userName, string userPassword)
         {
-            IEntityService<BisUsers> BisUsersService = new BisUsersService();
-            var user = BisUsersService.GetAll().Where(x => x.name == userName).FirstOrDefault();
+            BisUserService = new BisUserService();
+            logAction = new LogAction();
+            var user = BisUserService.FindBy(x => x.Name.ToLower() == userName.ToLower()).FirstOrDefault();
             if (user == null)
             {
-                Console.WriteLine("{0} user {1} not exist", DateTime.Now, userName);
-                return "false";
+                Console.WriteLine("{0} user {1} is not exists", DateTime.Now, userName);
+                logAction.LogAuthentication(1, 7);
+                logAction.Dispose();
+                return "notRegistered";
             }
             else
             {
-                    if (Hash.VerifyHashedPassword(user.password, userPassword) && user.registration == 1)
+                BisAccountService = new BisAccountService();
+                var userAccount = BisAccountService.FindBy(x => x.User_Id == user.USER_id).FirstOrDefault();
+                var iFverified = Hash.VerifyHashedPassword(userAccount.Password, userPassword);
+                if (iFverified)
+                {
+                    switch (userAccount.registration)
                     {
-                        Console.WriteLine("User {0} login at {1}", user.name, DateTime.Now);
-                        return "true";
+                        case 1:
+                            Console.WriteLine("User {0} login at {1}", user.Name, DateTime.Now);
+                            userAccount.registration = 2;
+                            BisAccountService.AddOrUpdate(userAccount);
+                            logAction.LogConnect(user.USER_id, 1);
+                            logAction.Dispose();
+                            return "true";
+                        case 2:
+                            Console.WriteLine("{0} user {1} has already logged in this system", DateTime.Now,
+                                user.Name);
+                            logAction.LogAuthentication(user.USER_id, 8);
+                            logAction.Dispose();
+                            return "logged";
+                        default:
+                            Console.WriteLine("{0} user {1} should enter the registration code", DateTime.Now,
+                                user.Name);
+                            logAction.LogAuthentication(user.USER_id, 4);
+                            logAction.Dispose();
+                            return "code";
                     }
-                    else if (Hash.VerifyHashedPassword(user.password, userPassword) && user.registration != 1)
-                    {
-                        Console.WriteLine("{0} user {1} should enter the registration code", DateTime.Now, user.name);
-                        return "code";
-                    }
-                    else
-                       {
-                        Console.WriteLine("{0} user {1} entered incorrect password", DateTime.Now, user.name);
-                        return "false";
-                    }
-                }   
+                }
+                else
+                {
+                    Console.WriteLine("{0} user {1} entered incorrect password", DateTime.Now, user.Name);
+                    logAction.LogAuthentication(user.USER_id, 9);
+                    logAction.Dispose();
+                    return "false";
+                }
+            }
         }
+
         public bool AddNewUser(string name, string password, string email, string phone)
         {
-            IEntityService<BisUsers> BisUsersService = new BisUsersService();
-            var tmpName = BisUsersService.GetAll().Where(n => n.name == name).FirstOrDefault();
-            var tmpMail = BisUsersService.GetAll().Where(n => n.email == email).FirstOrDefault();
-            var tmpPhone = BisUsersService.GetAll().Where(n => n.phone == phone).FirstOrDefault();
-
-                if (tmpName == null && tmpMail == null && tmpPhone == null)
-                {
+            BisUserService = new BisUserService();
+            BisAccountService = new BisAccountService();
+            logAction = new LogAction();
+            var tmpName = BisUserService.GetAll().Where(n => n.Name == name).FirstOrDefault();
+            var tmpMail = BisUserService.GetAll().Where(n => n.Email == email).FirstOrDefault();
+            var tmpPhone = BisUserService.GetAll().Where(n => n.Phone == phone).FirstOrDefault();
+            if (tmpName == null && tmpMail == null && tmpPhone == null)
+            {
                 try
                 {
                     var code = RegistrationNumber();
-                    BisUsers user = new BisUsers();
-                    user.name = name;
-                    user.password = Hash.HashPassword(password);
-                    user.email = email;
-                    user.phone = phone;
-                    user.registration = code;
-                    BisUsersService.AddOrUpdate(user);
+                    user = new BisUser();
+                    account = new BisAccount();
+                    user.Name = name;
+                    user.Email = email;
+                    user.Phone = phone;
+                    BisUserService.AddOrUpdate(user);
+                    newUser = new BisUserService();
+                    account.User_Id = newUser.FindBy(x => x.Name == name).FirstOrDefault().USER_id;
+                    account.Password = Hash.HashPassword(password);
+                    account.registration = code;
+                    BisAccountService.AddOrUpdate(account);
+                    Console.WriteLine("New user {0} was registered at {1}", user.Name, DateTime.Now);
+                    logAction.LogAuthentication(Convert.ToInt32(account.User_Id), 3);
                     SMTP.SendMail(email, code);
+                    Console.WriteLine("Email was sent on {0} at {1}", user.Email, DateTime.Now);
+                    Console.WriteLine();
+                    logAction.LogAuthentication(Convert.ToInt32(account.User_Id), 5);
+                    logAction.Dispose();
                 }
                 catch (Exception ex)
                 {
                     LogFile.GetExceptions(ex);
                 }
+
                 return true;
-                }
-                else
-                    return false;
+            }
+            else
+                return false;
         }
+
         private int RegistrationNumber()
         {
             Random random = new Random();
@@ -75,23 +119,29 @@ namespace AuthenticationService
 
         public bool GetCode(string userName, int code)
         {
-            IEntityService<BisUsers> BisUsersService = new BisUsersService();
-            var user = BisUsersService.GetAll().Where(x => x.name == userName).FirstOrDefault();
-            if (user.registration == code)
-                {
+            BisUserService = new BisUserService();
+            BisAccountService = new BisAccountService();
+            logAction = new LogAction();
+            var user = BisUserService.FindBy(x => x.Name == userName).FirstOrDefault();
+            var account = BisAccountService.FindBy(x => x.User_Id == user.USER_id).FirstOrDefault();
+            if (account.registration == code)
+            {
                 try
                 {
-                    user.registration = 1;
-                    BisUsersService.AddOrUpdate(user);
+                    account.registration = 1;
+                    BisAccountService.AddOrUpdate(account);
+                    logAction.LogAuthentication(Convert.ToInt32(account.User_Id), 6);
+                    logAction.Dispose();
                 }
                 catch (Exception ex)
                 {
                     LogFile.GetExceptions(ex);
                 }
+
                 return true;
-                }
-                else
-                    return false;   
+            }
+            else
+                return false;
         }
     }
 }

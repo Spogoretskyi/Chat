@@ -12,6 +12,7 @@ namespace DBLayer.Repositories
         IQueryable<T> GetAll();
         IQueryable<T> FindBy(Expression<Func<T, bool>> predicate);
         T Get(int id);
+        T GetByName(string name);
         T AddOrUpdate(T obj);
         T Delete(T obj);
     }

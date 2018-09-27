@@ -188,5 +188,11 @@
   <ItemGroup>
     <Resource Include="Visual Studio.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Attach_File-512.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Closed_Folder-512.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

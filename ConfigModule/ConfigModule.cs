@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using DBLayer.Repositories;
 using System.Data.Entity;
-using DBLayer.BizLayer;
+using DBLayer.BisLayer;
 using DBLayer;
 
 namespace ConfigModule
@@ -10,9 +10,17 @@ namespace ConfigModule
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType(typeof(DBmodel)).As(typeof(DbContext))
-                .InstancePerLifetimeScope();
-            builder.RegisterType(typeof(BisUsersService)).As(typeof(IEntityService<BisUsers>))
+            builder.RegisterType(typeof(EntityDBModel)).As(typeof(DbContext)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof(BisUserService)).As(typeof(IEntityService<BisUser>)).InstancePerRequest();
+            builder.RegisterType(typeof(BisAccountService)).As(typeof(IEntityService<BisAccount>)).InstancePerRequest();
+            builder.RegisterType(typeof(LogAuthenticationService))
+                .As(typeof(IEntityService<BisLogAuthentication>))
+                .InstancePerRequest();
+            builder.RegisterType(typeof(LogConnectService))
+                .As(typeof(IEntityService<BisLogConnect>))
+                .InstancePerRequest();
+            builder.RegisterType(typeof(LogMessagingService))
+                .As(typeof(IEntityService<BisLogConnect>))
                 .InstancePerRequest();
             base.Load(builder);
         }

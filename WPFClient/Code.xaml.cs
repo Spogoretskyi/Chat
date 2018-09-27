@@ -10,6 +10,7 @@ namespace WPFClient
         public string ErrMode = string.Empty;
         string userName;
         ProxyAuthentication.AuthenticationContractClient server;
+
         public Code(string name)
         {
             try

@@ -109,7 +109,7 @@
       <wsa10:EndpointReference>
         <wsa10:Address>net.tcp://localhost:9091/Authentication</wsa10:Address>
         <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
-          <Upn>USER-PC\Sergii</Upn>
+          <Upn>spog@kyiv.ciklum.net</Upn>
         </Identity>
       </wsa10:EndpointReference>
     </wsdl:port>

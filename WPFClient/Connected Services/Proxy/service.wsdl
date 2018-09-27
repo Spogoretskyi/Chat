@@ -53,6 +53,9 @@
   <wsdl:message name="IServiceContract_RemoveUser_InputMessage">
     <wsdl:part name="parameters" element="tns:RemoveUser" />
   </wsdl:message>
+  <wsdl:message name="IServiceContract_GetUser_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetUser" />
+  </wsdl:message>
   <wsdl:message name="IServiceContract_GetAllUsers_InputMessage">
     <wsdl:part name="parameters" element="tns:GetAllUsers" />
   </wsdl:message>
@@ -65,6 +68,9 @@
   <wsdl:message name="IServiceContract_RecieveMessage_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:RecieveMessage" />
   </wsdl:message>
+  <wsdl:message name="IServiceContract_RecievePmMessage_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:RecievePmMessage" />
+  </wsdl:message>
   <wsdl:message name="IServiceContract_All_Users_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:All_Users" />
   </wsdl:message>
@@ -74,36 +80,42 @@
   <wsdl:message name="IServiceContract_ReceiverFile_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:ReceiverFile" />
   </wsdl:message>
-  <wsdl:portType name="IServiceContract">
-    <wsdl:operation name="Connect">
+  <wsdl:portType msc:usingSession="true" name="IServiceContract">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Connect">
       <wsdl:input wsaw:Action="http://tempuri.org/IServiceContract/Connect" message="tns:IServiceContract_Connect_InputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="SendMessage">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="SendMessage">
       <wsdl:input wsaw:Action="http://tempuri.org/IServiceContract/SendMessage" message="tns:IServiceContract_SendMessage_InputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="SendPMmessage">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="SendPMmessage">
       <wsdl:input wsaw:Action="http://tempuri.org/IServiceContract/SendPMmessage" message="tns:IServiceContract_SendPMmessage_InputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="RemoveUser">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="RemoveUser">
       <wsdl:input wsaw:Action="http://tempuri.org/IServiceContract/RemoveUser" message="tns:IServiceContract_RemoveUser_InputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetAllUsers">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetUser">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServiceContract/GetUser" message="tns:IServiceContract_GetUser_InputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetAllUsers">
       <wsdl:input wsaw:Action="http://tempuri.org/IServiceContract/GetAllUsers" message="tns:IServiceContract_GetAllUsers_InputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="SendFile">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="SendFile">
       <wsdl:input wsaw:Action="http://tempuri.org/IServiceContract/SendFile" message="tns:IServiceContract_SendFile_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IServiceContract/SendFileResponse" message="tns:IServiceContract_SendFile_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="RecieveMessage">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="RecieveMessage">
       <wsdl:output wsaw:Action="http://tempuri.org/IServiceContract/RecieveMessage" message="tns:IServiceContract_RecieveMessage_OutputCallbackMessage" />
     </wsdl:operation>
-    <wsdl:operation name="All_Users">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="RecievePmMessage">
+      <wsdl:output wsaw:Action="http://tempuri.org/IServiceContract/RecievePmMessage" message="tns:IServiceContract_RecievePmMessage_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="All_Users">
       <wsdl:output wsaw:Action="http://tempuri.org/IServiceContract/All_Users" message="tns:IServiceContract_All_Users_OutputCallbackMessage" />
     </wsdl:operation>
-    <wsdl:operation name="UserRemove">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="UserRemove">
       <wsdl:output wsaw:Action="http://tempuri.org/IServiceContract/UserRemove" message="tns:IServiceContract_UserRemove_OutputCallbackMessage" />
     </wsdl:operation>
-    <wsdl:operation name="ReceiverFile">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="ReceiverFile">
       <wsdl:output wsaw:Action="http://tempuri.org/IServiceContract/ReceiverFile" message="tns:IServiceContract_ReceiverFile_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
@@ -135,6 +147,12 @@
         <soap12:body use="literal" />
       </wsdl:input>
     </wsdl:operation>
+    <wsdl:operation name="GetUser">
+      <soap12:operation soapAction="http://tempuri.org/IServiceContract/GetUser" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+    </wsdl:operation>
     <wsdl:operation name="GetAllUsers">
       <soap12:operation soapAction="http://tempuri.org/IServiceContract/GetAllUsers" style="document" />
       <wsdl:input>
@@ -152,6 +170,12 @@
     </wsdl:operation>
     <wsdl:operation name="RecieveMessage">
       <soap12:operation soapAction="http://tempuri.org/IServiceContract/RecieveMessage" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RecievePmMessage">
+      <soap12:operation soapAction="http://tempuri.org/IServiceContract/RecievePmMessage" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>
@@ -181,7 +205,7 @@
       <wsa10:EndpointReference>
         <wsa10:Address>net.tcp://localhost:9090/Chat_Server</wsa10:Address>
         <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
-          <Upn>USER-PC\Sergii</Upn>
+          <Upn>spog@kyiv.ciklum.net</Upn>
         </Identity>
       </wsa10:EndpointReference>
     </wsdl:port>

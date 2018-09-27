@@ -12,6 +12,7 @@ namespace Repository
         IEnumerable<T> GetAll();
         IEnumerable<T> FindBy(Expression<Func<T, bool>> predicate);
         T Get(int id);
+        T GetByName(string name);
         void AddOrUpdate(T obj);
         void Delete(T obj);
     }

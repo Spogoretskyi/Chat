@@ -46,7 +46,7 @@ namespace WPFClient
                 server.GetUser(user);
 
                 string connect = String.Format("You connected at {0}\n", DateTime.Now.ToString("HH:mm"));
-                SendTo = "";
+                SendTo = String.Empty;
                 Add_Colors(connect, Brushes.CadetBlue);
                 
             }
@@ -71,10 +71,6 @@ namespace WPFClient
                 ListBox_Users.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() =>
                 {
                     ListBox_Users.Items.Clear();
-
-                    if (allUsers.Length > 2)
-                        ListBox_Users.Items.Add("All");
-
                     ListBox_Users.Items.Add(userName + " (you)");
 
                     foreach (var user in allUsers)
@@ -108,7 +104,6 @@ namespace WPFClient
                 TextBox_Chat.Dispatcher.Invoke(DispatcherPriority.Background,
                     new Action(() => { Add_Colors(message, Brushes.DarkSlateGray); }));
                 server.GetUser(user);
-                //server.GetAllUsers();
             }
             catch (Exception ex)
             {
@@ -134,11 +129,13 @@ namespace WPFClient
         {
                     try
                     {
+                        if (SendTo == userName + " (you)")
+                            SendTo = String.Empty;
                         Proxy.ChatMessage message = new Proxy.ChatMessage();
                         if (TextBox_Input.Text != String.Empty)
                         {
                             //send to all
-                            if (SendTo == String.Empty || SendTo == "All")
+                            if (SendTo == String.Empty)
                             {
                                 message.User = user;
                                 message.Message = TextBox_Input.Text;
@@ -149,7 +146,7 @@ namespace WPFClient
                                 Add_Colors(ownMeassage, Brushes.DarkCyan);
                             }
                             //send PM
-                            else if (SendTo != String.Empty || SendTo != "All")
+                            else
                             {
                                 message.User = user;
                                 message.Message = TextBox_Input.Text;
@@ -163,7 +160,7 @@ namespace WPFClient
                              }
                         }
                         TextBox_Input.Text = String.Empty;
-                        SendTo = "";
+                        SendTo = String.Empty;
                         ListBox_Users.UnselectAll();
                     }
                     catch (Exception ex)
@@ -200,7 +197,7 @@ namespace WPFClient
 
         private void Button_Send_File_Click(object sender, RoutedEventArgs e)
         {
-            if (SendTo != String.Empty || SendTo != (userName + " (you)"))
+            if (SendTo != String.Empty)
             {
                 Stream stream = null;
                 try
@@ -247,25 +244,19 @@ namespace WPFClient
                     }
                 }
                 TextBox_Input.Text = String.Empty;
-                SendTo = "";
+                SendTo = String.Empty;
                 ListBox_Users.UnselectAll();
             }
         }
 
         private void Button_File_Click(object sender, RoutedEventArgs e)
         {
-            ListBox_Users.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-            {
-                if (ListBox_Users.SelectedItem.ToString() != (userName + " (you)"))
-                {
-                    System.Diagnostics.Process.Start(_files_path);
-                }
-            }));
+                System.Diagnostics.Process.Start(_files_path);
         }
 
         private void ListBox_Users_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-                    if (ListBox_Users.SelectedItem.ToString() != (userName + " (you)"))
+                    if (ListBox_Users.SelectedItem.ToString() != userName + " (you)")
                         SendTo = ListBox_Users.SelectedItem.ToString();
         }
 

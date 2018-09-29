@@ -102,7 +102,7 @@ namespace Server
         {
             logAction = new LogAction();
             BisUserService = new BisUserService();
-            string message = String.Format("{0} sent to you file: {1} at {2}\n", newMessage.Sender, newMessage.FileName,
+            string message = String.Format("{0} sent you file: {1} at {2}\n", newMessage.Sender, newMessage.FileName,
                 newMessage.Time.ToString("HH:mm"));
             Console.Write(message);
             var sender = BisUserService.FindBy(x => x.Name.ToLower() == newMessage.Sender.ToLower())
